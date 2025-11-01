@@ -1,0 +1,503 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>NCSA Mosaic byChromium</title>
+    
+    <style>
+        body {
+            margin: 0;
+            padding: 0 6px 0 6px;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            overflow: hidden;
+            background-color: #c0c0c0;
+            font-family: Tahoma, Geneva, sans-serif;
+            font-size: 12px;
+        }
+    
+        #menubar {
+            display: flex;
+            background-color: #c0c0c0;
+            border-top: 2.5px solid #f0f0f0;
+            border-left: 2px solid #f0f0f0;
+            border-right: 2px solid #666666;
+            border-bottom: 2px solid #666666;
+            padding: 2px 5px;
+            width: auto;
+            margin: 0px 10px 0px 10px 
+            
+            
+        }
+        #menubar a {
+            color: #000;
+            text-decoration: none;
+            border: none;
+            background-color: transparent;
+            padding: 0 8px;
+            margin-right: 5px;
+            cursor: pointer;
+            line-height: 15px;
+            display: inline-block;
+        }
+        #menubar a:last-child {
+            margin-left: 5px !important;
+        }
+        #menubar a:hover {
+            background-color: #e0e0e0;
+        }
+
+        .icon-buttons-container { 
+            display: flex;
+            align-items: center; 
+            flex-shrink: 0;
+            margin-left: 5px; 
+        }
+
+        .toolbar-container {
+            display: flex;
+        }
+        
+        #button-bar {
+            display: flex;
+            align-items: stretch;
+            padding: 2px;
+            margin-bottom: 3px;
+        }
+        .nav-button {
+            background-color: #c0c0c0;
+            border: 2px solid;
+            border-color: #f0f0f0 #666666 #666666 #f0f0f0; 
+            
+            padding: 0; 
+            margin-right: 2px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            white-space: nowrap;
+            position: relative; 
+            width: 28px; 
+            height: 28px; 
+        }
+
+
+        
+        .nav-button img {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            pointer-events: none;
+            transition: opacity 0.05s, transform 0.05s;
+        }
+
+        
+        .pressed-icon {
+            opacity: 0; 
+        }
+ 
+        .nav-button:not(:disabled):active {
+            border-color: #666666 #f0f0f0 #f0f0f0 #666666; 
+        }
+        
+        .nav-button:not(:disabled):active .button-icon {
+            opacity: 0; 
+        }
+        .nav-button:not(:disabled):active .pressed-icon {
+            opacity: 1; 
+            transform: translate(-50%, -50%) translate(1px, 1px);
+        }
+
+        .nav-button:disabled {
+            cursor: default;
+            border-color: #c0c0c0; 
+        }
+        
+
+        .nav-button:disabled:active {
+            border-color: #c0c0c0; 
+        }
+        
+        .nav-button:disabled:active .button-icon {
+             opacity: 1; 
+             transform: translate(-50%, -50%); 
+        }
+        .nav-button:disabled:active .pressed-icon {
+            opacity: 0; 
+            transform: translate(-50%, -50%);
+        }
+
+
+        .button-icon {
+            pointer-events: none;
+            transition: opacity 0.05s, transform 0.05s;
+        }
+
+        #toolbar-container {
+            display: flex;
+            flex-direction: column;
+            padding: 2px;
+            background-color: #c0c0c0;
+            margin-left: -10px; 
+            border-top: none;
+            box-shadow: none;
+        }
+        #button-bar {
+            display: flex;
+            align-items: center;
+            padding: 2px 5px;
+            border: none;
+            background-color: #c0c0c0;
+        }
+        #button-bar button {
+            border: none;
+            box-shadow: none;
+            background-color: #c0c0c0;
+            padding: 1px 0;
+            margin-right: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            width: 23px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        #button-bar button:active {
+            border: none;
+            box-shadow: none;
+        }
+        #url-bar {
+            background-color: #c0c0c0;
+            display: flex;
+            align-items: center;
+            padding: 0;
+            margin-top: 5px; 
+            padding-top: 2px;
+            padding-bottom: 2px;
+        }
+    
+        #url-input {
+            flex-grow: 0;
+            background-color: #999999;
+            color: #000;
+            width: 100%; 
+            height: 22px;
+            border-top: 2.5px solid #4c4c4c;
+            border-left: 2.5px solid #4c4c4c;
+            border-right: 2.5px solid #f0f0f0;
+            border-bottom: 2.5px solid #f0f0f0;
+            outline: none; 
+        }
+        
+        #url-label {
+            flex-shrink: 0;
+            margin-right: 2px; 
+            margin-right: 5px;
+            color: #000000;
+        }
+        
+        #webview-container {
+            flex-grow: 1;
+            border: 2px solid #000;
+            border-top-color: #777;
+            border-left-color: #777;
+            border-right-color: #fff;
+            border-bottom-color: #fff;
+            overflow: hidden;
+        }
+        webview {
+            flex-grow: 0;
+            min-height: 1;
+            border-top: 2.5px solid #4c4c4c;;
+            border-left: 2.5px solid #4c4c4c;
+            border-right: 2.5px solid #f0f0f0;
+            border-bottom: 2.5px solid #f0f0f0;
+            margin: 5px;
+            margin-right: 5px;
+            box-shadow: 0 0 0 0px #c0c0c0;
+}
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #c0c0c0; 
+            font-family: 'monospace', 'Courier New', monospace; 
+        }
+        #custom-title-menu {
+    display: none !important;
+}
+
+    </style>
+</head>
+<body>
+    <div id="menubar">
+        <a href="#">File</a>
+        <a href="#">Options</a>
+        <a href="#">Navigate</a>
+        <a href="#">Annotate</a>
+        <a href="#">News</a>
+        <div style="flex-grow: 1;"></div>
+        <a href="#">Help</a>  </div>
+    </div>
+    
+    <div id="toolbar-container">
+    <div id="button-bar">
+        
+        
+        <button id="bunnri-button" class="nav-button" disabled>
+            <img src="icons/bunnri.png" alt="separation" class="button-icon">
+            <img src="icons/bunnri-active.png" alt="separation pressed" class="pressed-icon">
+        </button>
+        <button id="back-nav-button" class="nav-button" disabled>
+            <img src="icons/back-disabled.png" alt="Back" class="button-icon"
+                 data-enabled-src="icons/back.png" 
+                 data-disabled-src="icons/back-disabled.png">
+            <img src="icons/back-active.png" alt="Back pressed" class="pressed-icon">
+        </button>
+        <button id="forward-button" class="nav-button" disabled>
+            <img src="icons/forwd-disabled.png" alt="Forward" class="button-icon"
+                 data-enabled-src="icons/forwd.png" 
+                 data-disabled-src="icons/forwd-disabled.png">
+            <img src="icons/forwd.png" alt="Forward pressed" class="pressed-icon">
+        </button>
+        <button id="home-button" class="nav-button">
+            <img src="icons/home.png" alt="Home" class="button-icon">
+            <img src="icons/home-active.png" alt="Home pressed" class="pressed-icon">
+        </button>
+        <button id="reload-button" class="nav-button">
+            <img src="icons/reload.png" alt="Reload" class="button-icon">
+            <img src="icons/reload-active.png" alt="Reload pressed" class="pressed-icon">
+        </button>
+        <button id="new-window-button" class="nav-button">
+            <img src="icons/open.png" alt="New" class="button-icon">
+            <img src="icons/open-active.png" alt="New pressed" class="pressed-icon">
+        </button>
+        <button id="save-button" class="nav-button">
+            <img src="icons/save.png" alt="Save" class="button-icon">
+            <img src="icons/save-active.png" alt="Save pressed" class="pressed-icon">
+        </button>
+        <button id="clone-window-button" class="nav-button">
+            <img src="icons/clone.png" alt="Clone" class="button-icon">
+            <img src="icons/clone-active.png" alt="Clone pressed" class="pressed-icon">
+        </button>
+        <button id="destroy-window-button" class="nav-button">
+            <img src="icons/clothes.png" alt="Destroy" class="button-icon">
+            <img src="icons/clothes-active.png" alt="Destroy pressed" class="pressed-icon">
+        </button>
+        <button id="print-button" class="nav-button">
+            <img src="icons/Print.png" alt="print" class="button-icon">
+            <img src="icons/Print-active.png" alt="print pressed" class="pressed-icon">
+        </button>
+        <button id="news-button" class="nav-button">
+            <img src="icons/news.png" alt="News" class="button-icon">
+            <img src="icons/news-active.png" alt="News pressed" class="pressed-icon">
+        </button>
+            </div>
+        <div id="url-bar">
+            <span id="url-label">ㅤㅤURL:</span>
+            <input type="text" id="url-input" placeholder="URL">
+        </div>
+    </div>
+
+    <webview id="browser-view"></webview>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            let HOME_URL = 'https://www.google.com'; 
+            const MSN_URL = 'https://www.msn.com';
+
+            const urlInput = document.getElementById('url-input');
+            const backButton = document.getElementById('back-nav-button'); 
+
+            const forwardButton = document.getElementById('forward-button');
+            const reloadButton = document.getElementById('reload-button');
+            const homeButton = document.getElementById('home-button');
+            const newWindowButton = document.getElementById('new-window-button');
+            const browserView = document.getElementById('browser-view');
+            const newsButton = document.getElementById('news-button');
+            const saveButton = document.getElementById('save-button');
+            const cloneWindowButton = document.getElementById('clone-window-button');
+            const destroyWindowButton = document.getElementById('destroy-window-button');
+            const printButton = document.getElementById('print-button');
+            const backIcon = backButton ? backButton.querySelector('.button-icon') : null;
+            const forwardIcon = forwardButton ? forwardButton.querySelector('.button-icon') : null;
+
+          
+            let isFirstNavigationAttempt = true; 
+            let initialUrlFromMain = null; 
+            let mainProcessUrlReceived = false;
+
+            const formatUrl = (url) => {
+                if (!url.match(/^(http:\/\/|https:\/\/)/i)) {
+                    return 'https://' + url;
+                }
+                return url;
+            };
+            const navigate = () => {
+                let url = urlInput.value;
+                url = formatUrl(url);
+                browserView.src = url;
+            };
+
+        
+            
+            const updateNavigationButtons = () => {
+                if (browserView && typeof browserView.canGoBack === 'function' && typeof browserView.canGoForward === 'function') {
+                    
+                  
+                    const canGoBack = browserView.canGoBack();
+                    backButton.disabled = !canGoBack;
+                    
+                    if (backIcon) {
+                       
+                        if (canGoBack) {
+                            backIcon.src = backIcon.dataset.enabledSrc; 
+                        } else {
+                            backIcon.src = backIcon.dataset.disabledSrc;
+                        }
+                    }
+
+                    const canGoForward = browserView.canGoForward();
+                    forwardButton.disabled = !canGoForward;
+                    
+                    if (forwardIcon) {
+                        
+                        if (canGoForward) {
+                            forwardIcon.src = forwardIcon.dataset.enabledSrc; 
+                        } else {
+                            forwardIcon.src = forwardIcon.dataset.disabledSrc; 
+                        }
+                    }
+                }
+            };
+            
+            const updateViewSize = () => {
+                const windowHeight = window.innerHeight;
+                const menuBarHeight = document.getElementById('menubar').offsetHeight;
+                const toolbarContainerHeight = document.getElementById('toolbar-container').offsetHeight;
+                const webviewHeight = windowHeight - menuBarHeight - toolbarContainerHeight - 10; 
+                if (webviewHeight > 0) {
+                    browserView.style.height = `${webviewHeight}px`;
+                }
+                browserView.style.width = 'auto';
+            };
+            
+            const initializeBrowser = () => {
+                   updateViewSize();
+    if (!mainProcessUrlReceived && !browserView.src) {
+        urlInput.value = HOME_URL;
+        browserView.src = HOME_URL;
+    }
+};
+
+            urlInput.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    navigate();
+                }
+            });
+            
+            backButton.addEventListener('click', () => {
+                
+                if (typeof browserView.canGoBack === 'function' && browserView.canGoBack()) {
+                    browserView.goBack();
+                }
+            });
+            
+            forwardButton.addEventListener('click', () => {
+                if (typeof browserView.canGoForward === 'function' && browserView.canGoForward()) {
+                    browserView.goForward();
+                }
+            });
+            
+            reloadButton.addEventListener('click', () => {
+                browserView.reload();
+            });
+            homeButton.addEventListener('click', () => {
+                browserView.src = HOME_URL;
+                urlInput.value = HOME_URL;
+            });
+            newWindowButton.addEventListener('click', () => {
+                let url = browserView.src || urlInput.value;
+                if (window.browserAPI && window.browserAPI.openNewWindow) {
+                    window.browserAPI.openNewWindow(url);
+                }
+            });
+            newsButton.addEventListener('click', (e) => {
+                e.preventDefault();
+                browserView.src = MSN_URL;
+                urlInput.value = MSN_URL;
+            });
+            cloneWindowButton.addEventListener('click', () => {
+                let currentUrl = browserView.src || urlInput.value;
+                if (window.browserAPI && window.browserAPI.openNewWindow) {
+                    window.browserAPI.openNewWindow(currentUrl);
+                }
+            });
+            destroyWindowButton.addEventListener('click', () => {
+                let currentUrl = browserView.src || urlInput.value;
+                if (window.browserAPI && window.browserAPI.destroyWindow) {
+                    window.browserAPI.destroyWindow(currentUrl);
+                }
+            });
+            printButton.addEventListener('click', () => {
+                browserView.print();
+            });
+
+            if (window.browserAPI && window.browserAPI.onLoadUrl) {
+                window.browserAPI.onLoadUrl((url) => {
+             
+                    initialUrlFromMain = url; 
+                    HOME_URL = url;
+                    browserView.src = url;
+                    urlInput.value = url;
+                    mainProcessUrlReceived = true;
+                });
+            }
+            
+           
+            browserView.addEventListener('will-navigate', (e) => {
+                 urlInput.value = e.url; 
+            });
+       
+            browserView.addEventListener('did-navigate', (e) => {
+                const url = e.url.toLowerCase();
+                
+              
+                if (isFirstNavigationAttempt) {
+                    isFirstNavigationAttempt = false;
+                    
+                 
+                    if (url.includes('msn.com') || url.includes('bing.com')) {
+                       
+                        browserView.src = HOME_URL; 
+                        urlInput.value = HOME_URL;
+                        updateNavigationButtons();
+                        return; 
+                    }
+                }
+             
+                urlInput.value = e.url;
+                updateNavigationButtons();
+            });
+            
+            browserView.addEventListener('did-navigate-in-page', (e) => {
+                
+                updateNavigationButtons();
+            });
+
+
+        
+            browserView.addEventListener('did-stop-loading', updateNavigationButtons);
+            browserView.addEventListener('did-fail-load', updateNavigationButtons);
+
+
+            
+            initializeBrowser();
+
+            window.addEventListener('resize', updateViewSize);
+
+        });
+    </script>
+</body>
+</html>
